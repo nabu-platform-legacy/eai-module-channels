@@ -57,7 +57,8 @@ public class ChannelArtifactGUIManager extends BaseJAXBGUIManager<ChannelConfigu
 		}
 	}
 	
+	@Override
 	public String getCategory() {
-		return "Channels";
+		return "Frameworks";
 	}
 }

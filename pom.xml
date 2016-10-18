@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nabu</groupId>
 	<artifactId>eai-module-channels</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>${nabu-eai-module-channels-version}</version>
 	<name>eai-module-channels</name>
 
 	<parent>
@@ -52,6 +52,52 @@
 		<dependency>
 			<groupId>be.nabu.libs.datatransactions</groupId>
 			<artifactId>datatransactions-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>be.nabu.libs.channels</groupId>
+			<artifactId>channels-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>be.nabu.libs.channels</groupId>
+			<artifactId>channels-resources</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>be.nabu.utils</groupId>
+			<artifactId>utils-io</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>be.nabu.libs.resources</groupId>
+			<artifactId>resources-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>be.nabu.libs.evaluator</groupId>
+			<artifactId>evaluator-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>be.nabu.libs.types</groupId>
+			<artifactId>types-java</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>be.nabu.libs.types</groupId>
+			<artifactId>types-binding-xml</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		
