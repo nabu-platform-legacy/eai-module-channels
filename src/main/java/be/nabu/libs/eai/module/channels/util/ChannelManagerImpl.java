@@ -41,7 +41,7 @@ public class ChannelManagerImpl implements ChannelManager {
 					providers.put("file+dir", new DirectoryInProvider());
 					providers.put("file", new FileInProvider());
 					providers.put("file+out", new FileOutProvider());
-					MethodServiceInterface transactIn = MethodServiceInterface.wrap(ServiceChannelProvider.class, "transact");
+					MethodServiceInterface transactIn = MethodServiceInterface.wrap(ServiceChannelProvider.class, "transactIn");
 					MethodServiceInterface transactOut = MethodServiceInterface.wrap(ServiceChannelProvider.class, "transactOut");
 					MethodServiceInterface transactInOut = MethodServiceInterface.wrap(ServiceChannelProvider.class, "transactInOut");
 					for (DefinedService service : EAIResourceRepository.getInstance().getArtifacts(DefinedService.class)) {

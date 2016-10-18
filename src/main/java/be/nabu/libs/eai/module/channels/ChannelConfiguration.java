@@ -1,15 +1,20 @@
 package be.nabu.libs.eai.module.channels;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import be.nabu.eai.api.ValueEnumerator;
 import be.nabu.eai.repository.util.KeyValueMapAdapter;
 import be.nabu.libs.datatransactions.api.Direction;
 import be.nabu.libs.datatransactions.api.Transactionality;
+import be.nabu.libs.eai.module.channels.util.ProviderEnumerator;
 
 @XmlRootElement(name = "channel")
+@XmlType(propOrder = { "context", "direction", "providerId", "transactionality", "properties", "priority", "finishAmount", "retryAmount", "retryInterval", "continueOnFailure" })
 public class ChannelConfiguration {
 	// the name of the provider
 	private String providerId, context;
@@ -23,11 +28,16 @@ public class ChannelConfiguration {
 
 	@XmlJavaTypeAdapter(value = KeyValueMapAdapter.class)
 	public Map<String, String> getProperties() {
+		if (properties == null) {
+			properties = new LinkedHashMap<String, String>();
+		}
 		return properties;
 	}
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
 	}
+	
+	@ValueEnumerator(enumerator = ProviderEnumerator.class)
 	public String getProviderId() {
 		return providerId;
 	}
