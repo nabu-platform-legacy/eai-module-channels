@@ -8,21 +8,23 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import be.nabu.eai.api.ValueEnumerator;
+import be.nabu.eai.repository.jaxb.ArtifactXMLAdapter;
 import be.nabu.eai.repository.util.KeyValueMapAdapter;
-import be.nabu.libs.datatransactions.api.Direction;
 import be.nabu.libs.datatransactions.api.Transactionality;
 import be.nabu.libs.eai.module.channels.util.ProviderEnumerator;
+import be.nabu.libs.eai.module.data.transactions.DataTransactionArtifact;
 
 @XmlRootElement(name = "channel")
-@XmlType(propOrder = { "context", "direction", "providerId", "transactionality", "properties", "priority", "finishAmount", "retryAmount", "retryInterval", "continueOnFailure" })
+@XmlType(propOrder = { "context", "providerId", "transactionality", "batch", "properties", "priority", "finishAmount", "retryAmount", "retryInterval", "continueOnFailure" })
 public class ChannelConfiguration {
 	// the name of the provider
 	private String providerId, context;
-	private Direction direction;
 	private Transactionality transactionality;
 	private int priority, finishAmount, retryAmount;
 	private long retryInterval;
 	private boolean continueOnFailure;
+	private DataTransactionArtifact dataTransactionProvider;
+	private boolean batch;
 	
 	private Map<String, String> properties;
 
@@ -49,12 +51,6 @@ public class ChannelConfiguration {
 	}
 	public void setContext(String context) {
 		this.context = context;
-	}
-	public Direction getDirection() {
-		return direction;
-	}
-	public void setDirection(Direction direction) {
-		this.direction = direction;
 	}
 	public Transactionality getTransactionality() {
 		return transactionality;
@@ -92,5 +88,17 @@ public class ChannelConfiguration {
 	public void setContinueOnFailure(boolean continueOnFailure) {
 		this.continueOnFailure = continueOnFailure;
 	}
-	
+	@XmlJavaTypeAdapter(value = ArtifactXMLAdapter.class)
+	public DataTransactionArtifact getDataTransactionProvider() {
+		return dataTransactionProvider;
+	}
+	public void setDataTransactionProvider(DataTransactionArtifact dataTransactionProvider) {
+		this.dataTransactionProvider = dataTransactionProvider;
+	}
+	public boolean isBatch() {
+		return batch;
+	}
+	public void setBatch(boolean batch) {
+		this.batch = batch;
+	}
 }

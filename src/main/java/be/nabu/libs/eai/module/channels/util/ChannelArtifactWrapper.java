@@ -28,7 +28,8 @@ public class ChannelArtifactWrapper implements Channel<Object> {
 
 	@Override
 	public Direction getDirection() {
-		return artifact.getConfig().getDirection() == null ? Direction.IN : artifact.getConfig().getDirection();
+		ChannelProvider<?> provider = ChannelManagerImpl.getInstance().getProviderResolver().getProvider(artifact.getConfig().getProviderId());
+		return provider == null ? null : provider.getDirection();
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class ChannelArtifactWrapper implements Channel<Object> {
 		String providerId = artifact.getConfig().getProviderId();
 		ComplexType type = null;
 		boolean asBean = false;
-		ChannelProvider<?> channelProvider = manager.getProviders().get(providerId);
+		ChannelProvider<?> channelProvider = manager.getProviderResolver().getProvider(providerId);
 		if (channelProvider instanceof ChannelServiceProvider) {
 			type = ((ChannelServiceProvider) channelProvider).getPropertyType();
 		}
