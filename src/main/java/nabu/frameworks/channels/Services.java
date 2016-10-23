@@ -39,7 +39,12 @@ public class Services {
 		}
 		ChannelManagerImpl instance = ChannelManagerImpl.getInstance();
 		ChannelOrchestrator orchestrator = new ChannelOrchestratorImpl(datastore, transactionProvider.getProvider(), EAIResourceRepository.getInstance().getName());
-		orchestrator.transact(instance, channelContext, direction, instance.getResultHandlerResolver().getProvider(resultHandlerId), requests.toArray(new URI[requests.size()]));
+		if (requests == null) {
+			orchestrator.transact(instance, channelContext, direction, instance.getResultHandlerResolver().getProvider(resultHandlerId));
+		}
+		else {
+			orchestrator.transact(instance, channelContext, direction, instance.getResultHandlerResolver().getProvider(resultHandlerId), requests.toArray(new URI[requests.size()]));
+		}
 	}
 	
 	public void recover(@NotNull @WebParam(name = "dataTransactionProviderId") String dataTransactionProviderId, @NotNull @WebParam(name = "since") Date since, @NotNull @WebParam(name = "channelRecoverySelectorId") String channelRecoverySelectorId) throws IOException {

@@ -18,6 +18,7 @@ import be.nabu.libs.channels.api.SingleChannelResultHandler;
 import be.nabu.libs.channels.resources.DirectoryInProvider;
 import be.nabu.libs.channels.resources.FileInProvider;
 import be.nabu.libs.channels.resources.FileOutProvider;
+import be.nabu.libs.channels.util.SimpleChannelResultHandler;
 import be.nabu.libs.datatransactions.api.Direction;
 import be.nabu.libs.datatransactions.api.ProviderResolver;
 import be.nabu.libs.eai.module.channels.ChannelArtifact;
@@ -117,8 +118,12 @@ public class ChannelManagerImpl implements ChannelManager {
 		return new ProviderResolver<ChannelResultHandler>() {
 			@Override
 			public String getId(ChannelResultHandler provider) {
-				if (Proxy.isProxyClass(provider.getClass())) {
-					InvocationHandler invocationHandler = Proxy.getInvocationHandler(provider);
+				Object providerToCheck = provider;
+				if (provider instanceof SimpleChannelResultHandler) {
+					providerToCheck = ((SimpleChannelResultHandler) provider).getHandler();
+				}
+				if (Proxy.isProxyClass(providerToCheck.getClass())) {
+					InvocationHandler invocationHandler = Proxy.getInvocationHandler(providerToCheck);
 					if (invocationHandler instanceof ServiceInvocationHandler) {
 						Service[] services = ((ServiceInvocationHandler<?>) invocationHandler).getServices();
 						return ((DefinedService) services[0]).getId();
