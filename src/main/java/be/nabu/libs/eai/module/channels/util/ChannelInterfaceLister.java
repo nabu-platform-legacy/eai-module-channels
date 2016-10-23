@@ -20,6 +20,9 @@ public class ChannelInterfaceLister implements InterfaceLister {
 					descriptions.add(new InterfaceDescriptionImpl("Channels", "Single Handler", "be.nabu.libs.channels.api.SingleChannelResultHandler.handle"));
 					descriptions.add(new InterfaceDescriptionImpl("Channels", "Batch Handler", "be.nabu.libs.channels.api.ChannelResultHandler.handle"));
 					descriptions.add(new InterfaceDescriptionImpl("Channels", "Recovery Selector", "be.nabu.libs.channels.api.ChannelRecoverySelector.recover"));
+					descriptions.add(new InterfaceDescriptionImpl("Channels", "Channel In Provider", "be.nabu.libs.eai.module.channels.api.ServiceChannelProvider.transactIn"));
+					descriptions.add(new InterfaceDescriptionImpl("Channels", "Channel Out Provider", "be.nabu.libs.eai.module.channels.api.ServiceChannelProvider.transactOut"));
+					descriptions.add(new InterfaceDescriptionImpl("Channels", "Channel In/Out Provider", "be.nabu.libs.eai.module.channels.api.ServiceChannelProvider.transactInOut"));
 					ChannelInterfaceLister.descriptions = descriptions;
 				}
 			}

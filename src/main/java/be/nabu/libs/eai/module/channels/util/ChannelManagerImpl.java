@@ -54,13 +54,13 @@ public class ChannelManagerImpl implements ChannelManager {
 					MethodServiceInterface transactInOut = MethodServiceInterface.wrap(ServiceChannelProvider.class, "transactInOut");
 					for (DefinedService service : EAIResourceRepository.getInstance().getArtifacts(DefinedService.class)) {
 						if (POJOUtils.isImplementation(service, transactIn)) {
-							providers.put(service.getId(), new ChannelServiceProvider(POJOUtils.newProxy(ServiceChannelProvider.class, EAIResourceRepository.getInstance(), SystemPrincipal.ROOT, service), Direction.IN, service));
+							providers.put(service.getId(), new ChannelServiceProvider(Direction.IN, service));
 						}
 						else if (POJOUtils.isImplementation(service, transactOut)) {
-							providers.put(service.getId(), new ChannelServiceProvider(POJOUtils.newProxy(ServiceChannelProvider.class, EAIResourceRepository.getInstance(), SystemPrincipal.ROOT, service), Direction.OUT, service));
+							providers.put(service.getId(), new ChannelServiceProvider(Direction.OUT, service));
 						}
 						else if (POJOUtils.isImplementation(service, transactInOut)) {
-							providers.put(service.getId(), new ChannelServiceProvider(POJOUtils.newProxy(ServiceChannelProvider.class, EAIResourceRepository.getInstance(), SystemPrincipal.ROOT, service), Direction.BOTH, service));
+							providers.put(service.getId(), new ChannelServiceProvider(Direction.BOTH, service));
 						}
 					}
 					this.providers = providers;
@@ -97,6 +97,9 @@ public class ChannelManagerImpl implements ChannelManager {
 		return new ProviderResolver<ChannelProvider<?>>() {
 			@Override
 			public String getId(ChannelProvider<?> provider) {
+				if (provider instanceof ChannelServiceProvider) {
+					return ((ChannelServiceProvider) provider).getService().getId();
+				}
 				for (String id : getProviders().keySet()) {
 					if (getProviders().get(id).equals(provider)) {
 						return id;
