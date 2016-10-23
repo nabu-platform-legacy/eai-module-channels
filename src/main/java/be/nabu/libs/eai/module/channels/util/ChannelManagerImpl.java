@@ -1,5 +1,7 @@
 package be.nabu.libs.eai.module.channels.util;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +14,7 @@ import be.nabu.libs.channels.api.Channel;
 import be.nabu.libs.channels.api.ChannelManager;
 import be.nabu.libs.channels.api.ChannelProvider;
 import be.nabu.libs.channels.api.ChannelResultHandler;
+import be.nabu.libs.channels.api.SingleChannelResultHandler;
 import be.nabu.libs.channels.resources.DirectoryInProvider;
 import be.nabu.libs.channels.resources.FileInProvider;
 import be.nabu.libs.channels.resources.FileOutProvider;
@@ -20,8 +23,10 @@ import be.nabu.libs.datatransactions.api.ProviderResolver;
 import be.nabu.libs.eai.module.channels.ChannelArtifact;
 import be.nabu.libs.eai.module.channels.api.ServiceChannelProvider;
 import be.nabu.libs.services.api.DefinedService;
+import be.nabu.libs.services.api.Service;
 import be.nabu.libs.services.pojo.MethodServiceInterface;
 import be.nabu.libs.services.pojo.POJOUtils;
+import be.nabu.libs.services.pojo.POJOUtils.ServiceInvocationHandler;
 
 public class ChannelManagerImpl implements ChannelManager {
 
@@ -108,6 +113,42 @@ public class ChannelManagerImpl implements ChannelManager {
 
 	@Override
 	public ProviderResolver<ChannelResultHandler> getResultHandlerResolver() {
-		return ChannelUtils.newChannelResultHandlerResolver();
+		ProviderResolver<ChannelResultHandler> defaultResolver = ChannelUtils.newChannelResultHandlerResolver();
+		return new ProviderResolver<ChannelResultHandler>() {
+			@Override
+			public String getId(ChannelResultHandler provider) {
+				if (Proxy.isProxyClass(provider.getClass())) {
+					InvocationHandler invocationHandler = Proxy.getInvocationHandler(provider);
+					if (invocationHandler instanceof ServiceInvocationHandler) {
+						Service[] services = ((ServiceInvocationHandler<?>) invocationHandler).getServices();
+						return ((DefinedService) services[0]).getId();
+					}
+					else {
+						throw new IllegalArgumentException("The proxy can not be reslved");
+					}
+				}
+				else {
+					return defaultResolver.getId(provider);
+				}
+			}
+			@Override
+			public ChannelResultHandler getProvider(String id) {
+				DefinedService handler = (DefinedService) EAIResourceRepository.getInstance().resolve(id);
+				if (handler == null) {
+					return defaultResolver.getProvider(id);
+				}
+				ChannelResultHandler channelResultHandler;
+				if (POJOUtils.isImplementation(handler, MethodServiceInterface.wrap(ChannelResultHandler.class, "handle"))) {
+					channelResultHandler = POJOUtils.newProxy(ChannelResultHandler.class, EAIResourceRepository.getInstance(), SystemPrincipal.ROOT, handler);
+				}
+				else if (POJOUtils.isImplementation(handler, MethodServiceInterface.wrap(SingleChannelResultHandler.class, "handle"))) {
+					channelResultHandler = ChannelUtils.newChannelResultHandler(POJOUtils.newProxy(SingleChannelResultHandler.class, EAIResourceRepository.getInstance(), SystemPrincipal.ROOT, handler));
+				}
+				else {
+					throw new IllegalArgumentException("The handler service does not implement batch or single handling interfaces");
+				}
+				return channelResultHandler;
+			}
+		};
 	}
 }
