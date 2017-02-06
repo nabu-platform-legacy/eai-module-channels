@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import be.nabu.eai.api.EnvironmentSpecific;
 import be.nabu.eai.api.ValueEnumerator;
 import be.nabu.eai.repository.util.KeyValueMapAdapter;
 import be.nabu.libs.datatransactions.api.Transactionality;
@@ -25,6 +26,7 @@ public class ChannelConfiguration {
 	
 	private Map<String, String> properties;
 
+	@EnvironmentSpecific
 	@XmlJavaTypeAdapter(value = KeyValueMapAdapter.class)
 	public Map<String, String> getProperties() {
 		if (properties == null) {
@@ -36,6 +38,7 @@ public class ChannelConfiguration {
 		this.properties = properties;
 	}
 	
+	@EnvironmentSpecific
 	@ValueEnumerator(enumerator = ProviderEnumerator.class)
 	public String getProviderId() {
 		return providerId;
@@ -49,6 +52,8 @@ public class ChannelConfiguration {
 	public void setContext(String context) {
 		this.context = context;
 	}
+	
+	@EnvironmentSpecific
 	public Transactionality getTransactionality() {
 		return transactionality;
 	}
