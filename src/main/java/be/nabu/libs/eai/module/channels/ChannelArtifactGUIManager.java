@@ -34,6 +34,7 @@ public class ChannelArtifactGUIManager extends BaseJAXBGUIManager<ChannelConfigu
 		return new ChannelArtifact(entry.getId(), entry.getContainer(), entry.getRepository());
 	}
 
+	@SuppressWarnings("unchecked")
 	public <V> void setValue(ChannelArtifact instance, Property<V> property, V value) {
 		if ("providerId".equals(property.getName())) {
 			Map<String, String> properties = getConfiguration(instance).getProperties();
@@ -54,6 +55,9 @@ public class ChannelArtifactGUIManager extends BaseJAXBGUIManager<ChannelConfigu
 		}
 		if (!"properties".equals(property.getName())) {
 			super.setValue(instance, property, value);
+		}
+		else if (value instanceof Map) {
+			getConfiguration(instance).getProperties().putAll(((Map<? extends String, ? extends String>) value));
 		}
 	}
 	
