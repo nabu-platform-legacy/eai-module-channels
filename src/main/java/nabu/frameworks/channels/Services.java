@@ -53,10 +53,11 @@ public class Services {
 		catch (Exception e) {
 			Notification notification = new Notification();
 			notification.setCode(0);
-			notification.setContext(Arrays.asList(channelContext, "nabu.frameworks.channels"));
+			notification.setContext(Arrays.asList(channelContext, dataTransactionProviderId));
 			notification.setMessage("Could not transact channel(s)");
 			notification.setDescription(Notification.format(e));
 			notification.setSeverity(Severity.ERROR);
+			notification.setType("nabu.frameworks.channels.transact");
 			EAIResourceRepository.getInstance().getEventDispatcher().fire(notification, this);
 			if (e instanceof ChannelException) {
 				throw (ChannelException) e;
@@ -91,7 +92,8 @@ public class Services {
 		catch (Exception e) {
 			Notification notification = new Notification();
 			notification.setCode(1);
-			notification.setContext(Arrays.asList(dataTransactionProviderId, "nabu.frameworks.channels"));
+			notification.setContext(Arrays.asList(dataTransactionProviderId));
+			notification.setType("nabu.frameworks.channels.recover");
 			notification.setMessage("Could not recover channel transaction(s)");
 			notification.setDescription(Notification.format(e));
 			notification.setSeverity(Severity.ERROR);
