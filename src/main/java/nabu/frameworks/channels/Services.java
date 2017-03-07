@@ -17,6 +17,7 @@ import be.nabu.libs.channels.api.ChannelOrchestrator;
 import be.nabu.libs.channels.api.ChannelRecoverySelector;
 import be.nabu.libs.channels.util.ChannelOrchestratorImpl;
 import be.nabu.libs.datastore.api.ContextualWritableDatastore;
+import be.nabu.libs.datatransactions.api.DataTransaction;
 import be.nabu.libs.datatransactions.api.Direction;
 import be.nabu.libs.eai.module.channels.util.ChannelManagerImpl;
 import be.nabu.libs.eai.module.data.transactions.DataTransactionArtifact;
@@ -71,23 +72,35 @@ public class Services {
 		}
 	}
 	
-	public void recover(@NotNull @WebParam(name = "dataTransactionProviderId") String dataTransactionProviderId, @NotNull @WebParam(name = "since") Date since, @NotNull @WebParam(name = "channelRecoverySelectorId") String channelRecoverySelectorId) throws IOException {
+	public void recover(@NotNull @WebParam(name = "dataTransactionProviderId") String dataTransactionProviderId, @NotNull @WebParam(name = "since") Date since, @WebParam(name = "channelRecoverySelectorId") String channelRecoverySelectorId) throws IOException {
 		try {
 			ContextualWritableDatastore<String> datastore = nabu.frameworks.datastore.Services.getAsDatastore(this.context);
 			DataTransactionArtifact transactionProvider = this.context.getServiceContext().getResolver(DataTransactionArtifact.class).resolve(dataTransactionProviderId);
 			if (transactionProvider == null) {
 				throw new IllegalArgumentException("Can not find transactionProvider: " + dataTransactionProviderId);
 			}
-			DefinedService channelRecoveryService = this.context.getServiceContext().getResolver(DefinedService.class).resolve(channelRecoverySelectorId);
-			if (channelRecoveryService == null) {
-				throw new IllegalArgumentException("Can not find channel recovery selector: " + channelRecoverySelectorId);
+			ChannelRecoverySelector channelRecoverySelector;
+			if (channelRecoverySelectorId != null) {
+				DefinedService channelRecoveryService = this.context.getServiceContext().getResolver(DefinedService.class).resolve(channelRecoverySelectorId);
+				if (channelRecoveryService == null) {
+					throw new IllegalArgumentException("Can not find channel recovery selector: " + channelRecoverySelectorId);
+				}
+				if (!POJOUtils.isImplementation(channelRecoveryService, MethodServiceInterface.wrap(ChannelRecoverySelector.class, "recover"))) {
+					throw new IllegalArgumentException("Service is not a channel recovery selector: " + channelRecoverySelectorId);
+				}
+				channelRecoverySelector = POJOUtils.newProxy(ChannelRecoverySelector.class, channelRecoveryService, this.context);
 			}
-			if (!POJOUtils.isImplementation(channelRecoveryService, MethodServiceInterface.wrap(ChannelRecoverySelector.class, "recover"))) {
-				throw new IllegalArgumentException("Service is not a channel recovery selector: " + channelRecoverySelectorId);
+			else {
+				channelRecoverySelector = new ChannelRecoverySelector() {
+					@Override
+					public boolean recover(DataTransaction<?> transaction) {
+						return true;
+					}
+				};
 			}
 			ChannelOrchestrator orchestrator = new ChannelOrchestratorImpl(datastore, transactionProvider.getProvider(), EAIResourceRepository.getInstance().getName());
 			ChannelManagerImpl instance = ChannelManagerImpl.getInstance();
-			orchestrator.recover(instance.getProviderResolver(), instance.getResultHandlerResolver(), since, POJOUtils.newProxy(ChannelRecoverySelector.class, channelRecoveryService, this.context));
+			orchestrator.recover(instance.getProviderResolver(), instance.getResultHandlerResolver(), since, channelRecoverySelector);
 		}
 		catch (Exception e) {
 			Notification notification = new Notification();
