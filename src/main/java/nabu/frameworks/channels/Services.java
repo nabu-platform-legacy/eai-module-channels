@@ -72,7 +72,7 @@ public class Services {
 		}
 	}
 	
-	public void recover(@NotNull @WebParam(name = "dataTransactionProviderId") String dataTransactionProviderId, @NotNull @WebParam(name = "since") Date since, @WebParam(name = "channelRecoverySelectorId") String channelRecoverySelectorId) throws IOException {
+	public void recover(@NotNull @WebParam(name = "dataTransactionProviderId") String dataTransactionProviderId, @NotNull @WebParam(name = "since") Date since, @WebParam(name = "channelRecoverySelectorId") String channelRecoverySelectorId) throws IOException, ChannelException {
 		try {
 			ContextualWritableDatastore<String> datastore = nabu.frameworks.datastore.Services.getAsDatastore(this.context);
 			DataTransactionArtifact transactionProvider = this.context.getServiceContext().getResolver(DataTransactionArtifact.class).resolve(dataTransactionProviderId);
@@ -113,6 +113,9 @@ public class Services {
 			EAIResourceRepository.getInstance().getEventDispatcher().fire(notification, this);
 			if (e instanceof IOException) {
 				throw (IOException) e;
+			}
+			else if (e instanceof ChannelException) {
+				throw (ChannelException) e;
 			}
 			else if (e instanceof RuntimeException) {
 				throw (RuntimeException) e;
