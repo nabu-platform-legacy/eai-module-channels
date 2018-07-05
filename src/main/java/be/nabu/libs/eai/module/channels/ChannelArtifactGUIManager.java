@@ -33,7 +33,7 @@ public class ChannelArtifactGUIManager extends BaseJAXBGUIManager<ChannelConfigu
 	protected ChannelArtifact newInstance(MainController controller, RepositoryEntry entry, Value<?>... values) throws IOException {
 		return new ChannelArtifact(entry.getId(), entry.getContainer(), entry.getRepository());
 	}
-
+	@Override
 	@SuppressWarnings("unchecked")
 	public <V> void setValue(ChannelArtifact instance, Property<V> property, V value) {
 		if ("providerId".equals(property.getName())) {

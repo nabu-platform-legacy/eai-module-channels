@@ -1,6 +1,8 @@
 package be.nabu.libs.eai.module.channels.util;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +67,12 @@ public class ChannelServiceProvider implements ChannelProvider<Object> {
 				}
 			}
 			catch (Exception e) {
-				handle.fail("Service execution failed: " + e.getMessage());
+				StringWriter writer = new StringWriter();
+				PrintWriter printer = new PrintWriter(writer);
+				e.printStackTrace(printer);
+				printer.flush();
+				handle.fail(writer.toString());
+				throw e instanceof ChannelException ? (ChannelException) e : new ChannelException(e);
 			}
 		}
 		catch (IOException e) {

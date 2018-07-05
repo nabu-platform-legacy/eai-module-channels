@@ -11,6 +11,7 @@ import be.nabu.eai.repository.EAIResourceRepository;
 import be.nabu.eai.repository.util.SystemPrincipal;
 import be.nabu.libs.channels.ChannelUtils;
 import be.nabu.libs.channels.api.Channel;
+import be.nabu.libs.channels.api.ChannelException;
 import be.nabu.libs.channels.api.ChannelManager;
 import be.nabu.libs.channels.api.ChannelProvider;
 import be.nabu.libs.channels.api.ChannelResultHandler;
@@ -19,6 +20,8 @@ import be.nabu.libs.channels.resources.DirectoryInProvider;
 import be.nabu.libs.channels.resources.FileInProvider;
 import be.nabu.libs.channels.resources.FileOutProvider;
 import be.nabu.libs.channels.util.SimpleChannelResultHandler;
+import be.nabu.libs.datatransactions.api.DataTransaction;
+import be.nabu.libs.datatransactions.api.DataTransactionHandle;
 import be.nabu.libs.datatransactions.api.Direction;
 import be.nabu.libs.datatransactions.api.ProviderResolver;
 import be.nabu.libs.eai.module.channels.ChannelArtifact;
@@ -121,6 +124,10 @@ public class ChannelManagerImpl implements ChannelManager {
 		return new ProviderResolver<ChannelResultHandler>() {
 			@Override
 			public String getId(ChannelResultHandler provider) {
+				// if there is no provider, return null
+				if (provider == null) {
+					return null;
+				}
 				Object providerToCheck = provider;
 				if (provider instanceof SimpleChannelResultHandler) {
 					providerToCheck = ((SimpleChannelResultHandler) provider).getHandler();
@@ -141,6 +148,15 @@ public class ChannelManagerImpl implements ChannelManager {
 			}
 			@Override
 			public ChannelResultHandler getProvider(String id) {
+				// if there is no id, return a default provider that does nothing
+				if (id == null) {
+					return new SimpleChannelResultHandler(new SingleChannelResultHandler() {
+						@Override
+						public void handle(DataTransaction<?> transaction) throws ChannelException {
+							// do nothing
+						}
+					});
+				}
 				DefinedService handler = (DefinedService) EAIResourceRepository.getInstance().resolve(id);
 				if (handler == null) {
 					return defaultResolver.getProvider(id);
