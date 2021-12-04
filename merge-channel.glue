@@ -1,0 +1,14 @@
+result = xml.objectify(file.read("channel.xml"))
+
+for (property : result/properties/property)
+	property["$value"] = parameter(
+		name: property["@key"],
+		category: "Basic",
+		title: null,
+		description: null,
+		type: null,
+		encrypted: false,
+		optional: true,
+		raw: property["$value"])/current
+
+file.write("channel.xml", xml.stringify(result))
